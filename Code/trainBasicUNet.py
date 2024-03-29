@@ -95,6 +95,6 @@ for epoch in range(args.epochs):
 
     avg_epoch_loss = sum(epoch_losses) / len(epoch_losses)
     losses.append(avg_epoch_loss)
-    if max(losses) < avg_epoch_loss:
+    if min(losses) == avg_epoch_loss:
         torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
         torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
