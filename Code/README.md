@@ -2,7 +2,7 @@
 
 Il codice `trainBasicUNet.py` viene eseguito tramite bash. 
 
-    python trainBasicUNet.py train.csv valid.csv dict_save_model epochs train_batch_size valid_batch_size
+    python trainBasicUNet.py --train.csv --valid.csv --dict_save_model --epochs --train_batch_size --valid_batch_size
 
 Dove i parametri rappresentano:
   1. Path `train.csv`
