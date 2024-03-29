@@ -63,7 +63,7 @@ if __name__ == '__main__':
     mse = MSEMetric(reduction= "mean")
     loss_function = nn.MSELoss(reduction='mean')
 
-
+losses = []
 for epoch in range(args.epochs):
     for mode in ['train', 'valid']:
         epoch_losses = []
@@ -71,7 +71,8 @@ for epoch in range(args.epochs):
         UNet.train() if mode == 'train' else UNet.eval()
 
         for batch in tqdm(loader):
-
+            
+    
             with torch.set_grad_enabled(mode == 'train'):
                 with autocast(enabled=True):
 
@@ -92,6 +93,8 @@ for epoch in range(args.epochs):
                         loss = loss_function(output, GT)
                         epoch_losses.append(loss.item())
 
-    if max(epoch_losses) < loss.item():
+    avg_epoch_loss = sum(epoch_losses) / len(epoch_losses)
+    losses.append(avg_epoch_loss)
+    if max(losses) < avg_epoch_loss:
         torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
         torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
