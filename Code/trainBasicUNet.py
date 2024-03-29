@@ -92,6 +92,6 @@ for epoch in range(args.epochs):
                         err = loss_function(output, GT)
                         epoch_losses.append(err.item())
 
-                        if max(epoch_losses) < err:
+                        if max(epoch_losses) < err.item():
                             torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
                             torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
