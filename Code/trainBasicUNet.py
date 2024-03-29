@@ -89,9 +89,9 @@ for epoch in range(args.epochs):
                         optimizer.step()
 
                     else:
-                        err = loss_function(output, GT)
-                        epoch_losses.append(err.item())
+                        loss = loss_function(output, GT)
+                        epoch_losses.append(loss.item())
 
-                        if max(epoch_losses) < err.item():
-                            torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
-                            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
+    if max(epoch_losses) < loss.item():
+        torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
+        torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
