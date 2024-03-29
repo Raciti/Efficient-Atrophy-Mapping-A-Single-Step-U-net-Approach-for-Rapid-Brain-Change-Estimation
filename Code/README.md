@@ -12,7 +12,7 @@ Dove i parametri rappresentano:
   5. Valore batch del train
   6. Valore batch del validation
 
-Solo i primi tre argomenti sono obbligatori.
+**Solo i primi tre argomenti sono obbligatori**.
 
 ## Formato CSV
 
