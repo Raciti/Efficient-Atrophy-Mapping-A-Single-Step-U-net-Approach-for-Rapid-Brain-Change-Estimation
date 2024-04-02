@@ -84,7 +84,7 @@ for epoch in range(args.epochs):
                         loss = loss_function(output, GT) 
                         print(f"Epoch[{epoch}/{args.epochs}] --> mean MSE: {loss.item()}")
                         loss.backward()  
-                        epoch_losses.append(loss.item())
+                        #epoch_losses.append(loss.item())
                         optimizer.step()
 
                     else:
