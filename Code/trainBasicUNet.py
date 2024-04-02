@@ -9,7 +9,6 @@ from torch.cuda.amp import autocast
 import monai
 from monai.data import CSVDataset
 from monai.networks.nets import BasicUNet
-from monai.metrics import MSEMetric
 from torch.optim import AdamW
 from monai.transforms import LoadImage, Compose
 
@@ -60,7 +59,6 @@ if __name__ == '__main__':
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
 
     optimizer = AdamW(UNet.parameters(), lr=1e-4)
-    mse = MSEMetric(reduction= "mean")
     loss_function = nn.MSELoss(reduction='mean')
 
 losses = []
