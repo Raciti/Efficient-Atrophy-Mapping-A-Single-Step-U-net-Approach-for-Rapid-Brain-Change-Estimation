@@ -84,15 +84,15 @@ for epoch in range(args.epochs):
                         loss = loss_function(output, GT) 
                         print(f"Epoch[{epoch}/{args.epochs}] --> mean MSE: {loss.item()}")
                         loss.backward()  
-                        #epoch_losses.append(loss.item())
                         optimizer.step()
 
                     else:
                         loss = loss_function(output, GT)
                         epoch_losses.append(loss.item())
-
-    avg_epoch_loss = sum(epoch_losses) / len(epoch_losses)
-    losses.append(avg_epoch_loss)
-    if min(losses) == avg_epoch_loss:
-        torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
-        torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
+        
+        if mode == 'valid':
+            avg_epoch_loss = sum(epoch_losses) / len(epoch_losses)
+            losses.append(avg_epoch_loss)
+            if min(losses) == avg_epoch_loss:
+                torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
+                torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
