@@ -69,8 +69,6 @@ for epoch in range(args.epochs):
         UNet.train() if mode == 'train' else UNet.eval()
 
         for batch in tqdm(loader):
-            
-    
             with torch.set_grad_enabled(mode == 'train'):
                 with autocast(enabled=True):
 
