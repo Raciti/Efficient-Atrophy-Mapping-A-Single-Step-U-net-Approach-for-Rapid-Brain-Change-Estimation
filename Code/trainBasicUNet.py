@@ -17,7 +17,7 @@ from monai.config import KeysCollection
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from tqdm import tqdm
 import numpy as np
-from utils import transform
+from utils import transform, CustomMSELoss
 
 import matplotlib.pyplot as plt
 
@@ -73,7 +73,8 @@ if __name__ == '__main__':
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
 
     optimizer = AdamW(UNet.parameters(), lr=1e-4)
-    loss_function = nn.MSELoss(reduction='mean')
+    #loss_function = nn.MSELoss(reduction='mean')
+    loss_function = CustomMSELoss(4)
     ssim = StructuralSimilarityIndexMeasure(data_range=1.0).to(device)
 
     history_loss = {"train": [], "valid": []}
