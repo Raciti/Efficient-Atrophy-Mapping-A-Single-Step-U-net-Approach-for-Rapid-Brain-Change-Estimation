@@ -2,15 +2,18 @@
 
 Il codice `trainBasicUNet.py` viene eseguito tramite bash. 
 
-    python trainBasicUNet.py --train.csv --valid.csv --dict_save_model --epochs --train_batch_size --valid_batch_size
+    python trainBasicUNet.py --train.csv --valid.csv --dict_save_model --gpu --loss --reduction --epochs --train_batch_size --valid_batch_size
 
 Dove i parametri rappresentano:
   1. Path `train.csv`
   2. Path `valid.csv`
   3. Path directory dove verranno salvati i pesi del modello
-  4. Numero di epoche
-  5. Valore batch del train
-  6. Valore batch del validation
+  4. La gpu su cui verrà eseguito il codice
+  5. Il tipo di loss che verrà utilizzata
+  6. Il tipo di reduzione adotattao
+  7. Numero di epoche
+  8. Valore batch del train
+  9. Valore batch del validation
 
 **Solo i primi tre argomenti sono obbligatori**.
 
