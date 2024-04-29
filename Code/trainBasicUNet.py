@@ -69,7 +69,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
-    print(device)
+    # print(device)
 
     #transform = Compose([preprocessing()])
 
