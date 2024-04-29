@@ -10,23 +10,25 @@ import monai
 from monai.data import CSVDataset
 from monai.networks.nets import BasicUNet
 from torch.optim import AdamW
-from monai.transforms import LoadImage, Compose, MapTransform, LoadImageD, ToTensord, AddChannelD, EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD
+from monai.transforms import LoadImage, Compose, MapTransform, LoadImageD, ToTensord, EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD #AddChannelD,
 from monai.config import KeysCollection
 #from monai.losses.ssim_loss import SSIMLoss
 #from monai.metrics.regression import SSIMetric
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from tqdm import tqdm
 import numpy as np
-from utils import transform, CustomMSELoss
+from utils import losses
+from monai.losses import LocalNormalizedCrossCorrelationLoss as NN
+from utils import transform
+
 
 import matplotlib.pyplot as plt
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
-    #EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
-    AddChannelD(keys=["immA", "immB", "immGT"]),
+    EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
+    #AddChannelD(keys=["immA", "immB", "immGT"]),
     ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
     #CropForegroundd(keys=["immA", "immB", "immGT"], source_key="immA"),
     #SpacingD(keys=["immA", "immB", "immGT"], pixdim=1.5),
@@ -43,16 +45,31 @@ transform = Compose([
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_csv', type=str, required=True, help='Path csv of train dataset.')
-    parser.add_argument('--valid_csv', type=str, required=True, help='Path csv of valid dataset.')
-    parser.add_argument('--dict_save_model', type=str, required=True, help='Path directory where to save checkpoint.')
-    parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--train_batch_size', type=int, default=4)
-    parser.add_argument('--valid_batch_size', type=int, default=4)
-
+    parser.add_argument('--train_csv', type=str, required=True, 
+                        help='Path csv of train dataset.')
+    parser.add_argument('--valid_csv', type=str, required=True, 
+                        help='Path csv of valid dataset.')
+    parser.add_argument('--dict_save_model', type=str, required=True, 
+                        help='Path directory where to save checkpoint.')
+    parser.add_argument('--gpu', type=str, default="0", 
+                        help='GPU ID numbers (default: 0).')
+    parser.add_argument('--loss', type=str, default="mse", 
+                        help='Image reconstruction loss - can be mse or ncc (default: mse).')
+    parser.add_argument('--reduction', type=str, default="mean", 
+                        help='Reduction loss - can be sum, max or mean. max can only be used in mse loss. (default: mean).')
+    parser.add_argument('--exp', type=int, default=2, 
+                        help='Exponent for the calculation of mse (default: mean).')
+    parser.add_argument('--epochs', type=int, default=100,
+                        help='Number of training epochs (default: 100)' )
+    parser.add_argument('--train_batch_size', type=int, default=4,
+                        help='Batch size training (default: 4)')
+    parser.add_argument('--valid_batch_size', type=int, default=4,
+                        help='Batch size validation (default: 4)')
+    
     args = parser.parse_args()
 
-
+    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
+    print(device)
 
     #transform = Compose([preprocessing()])
 
@@ -74,7 +91,23 @@ if __name__ == '__main__':
 
     optimizer = AdamW(UNet.parameters(), lr=1e-4)
     #loss_function = nn.MSELoss(reduction='mean')
-    loss_function = CustomMSELoss(4)
+
+    if args.loss == "mse" and args.reduction == "max":
+        loss_function = losses.CustomMSELoss(args.exp, "max")
+    elif args.loss == "mse" and args.reduction == "mean":
+        loss_function = losses.CustomMSELoss(args.exp, "mean")
+    elif args.loss == "mse" and args.reduction == "sum":
+        loss_function = losses.CustomMSELoss(args.exp, "sum")
+    elif args.loss == "ncc" and args.reduction == "mean":
+        loss_function = NN()
+    elif args.loss == "ncc" and args.reduction == "sum":
+        loss_function = NN(reduction="sum")
+    elif args.loss == "ncc" and args.reduction == "max":
+        raise RuntimeError("The value of reduction is not valid. max can only be used in mse loss.")
+        
+    else:
+        raise RuntimeError("The value of loss or reduction is not valid.")
+    
     ssim = StructuralSimilarityIndexMeasure(data_range=1.0).to(device)
 
     history_loss = {"train": [], "valid": []}
