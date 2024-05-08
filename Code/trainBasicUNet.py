@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
 
-    optimizer = AdamW(UNet.parameters(), lr=1e-4)
+    optimizer = AdamW(UNet.parameters())
     #loss_function = nn.MSELoss(reduction='mean')
 
     if args.loss == "mse" and args.reduction == "max":
@@ -117,6 +117,7 @@ if __name__ == '__main__':
     best_val_accuracy=0
     
     for epoch in range(args.epochs):
+        #print("Learning Rate:", optimizer.param_groups[-1]['lr'])
         sum_loss = {"train": 0, "valid": 0}
         sum_accuracy = {"train": 0, "valid": 0}
         
@@ -164,7 +165,6 @@ if __name__ == '__main__':
             history_loss[split].append(epoch_loss[split])
             history_acc[split].append(epoch_acc[split])
         
-        '''
         # Check if we obtained the best 
         if(best_val_loss is None or best_val_loss > epoch_loss["valid"]):
         #if min(losses) == avg_epoch_loss:
@@ -172,14 +172,14 @@ if __name__ == '__main__':
             print(f"Best val loss: {best_val_loss:.4f}\n")
             torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
             torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
-        '''
-        # Check if we obtained the best acc
+        
+        """# Check if we obtained the best acc
         if epoch_acc["valid"]>best_val_accuracy:
             # aggiorno e salvo il modello se è migliore
             best_val_accuracy=epoch_acc["valid"]
             print(f"Best val acc: {best_val_accuracy:.4f}\n")
             torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
-            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
+            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))"""
         
 
         

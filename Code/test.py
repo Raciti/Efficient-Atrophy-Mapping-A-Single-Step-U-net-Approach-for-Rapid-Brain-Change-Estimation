@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/lemuel_MSE_max/Unet-96.pth"))
+    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/train_mse_max/Unet-14.pth"))
 
     # Training immages    
     # test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/A_halfwayto_B_brain.nii.gz", 
