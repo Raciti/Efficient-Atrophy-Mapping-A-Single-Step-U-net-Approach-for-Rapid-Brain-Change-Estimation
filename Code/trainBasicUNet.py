@@ -69,7 +69,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
-    # print(device)
+    print(device)
 
     #transform = Compose([preprocessing()])
 
@@ -138,6 +138,7 @@ if __name__ == '__main__':
                         output = UNet(data)
 
                         loss = loss_function(output, GT)
+                        # print(loss.item())
                         # Update loss
                         sum_loss[mode] += loss.item()
 

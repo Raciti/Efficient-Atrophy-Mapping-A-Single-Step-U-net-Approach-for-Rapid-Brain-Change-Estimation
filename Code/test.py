@@ -10,7 +10,7 @@ import monai
 from monai.data import CSVDataset
 from monai.networks.nets import BasicUNet
 from torch.optim import AdamW
-from monai.transforms import SpacingD, LoadImage, Compose, MapTransform, LoadImageD, ToTensord, AddChannelD, EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD
+from monai.transforms import SpacingD, LoadImage, Compose, MapTransform, LoadImageD, ToTensord,  EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD #AddChannelD,
 from monai.config import KeysCollection
 
 from tqdm import tqdm
@@ -24,8 +24,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
-    #EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
-    AddChannelD(keys=["immA", "immB", "immGT"]),
+    EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
+    #AddChannelD(keys=["immA", "immB", "immGT"]),
     ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
     #CropForegroundd(keys=["immA", "immB", "immGT"], source_key="immA"),
     #SpacingD(keys=["immA", "immB", "immGT"], pixdim=1.5),
@@ -50,25 +50,40 @@ if __name__ == '__main__':
 
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-    UNet.load_state_dict(torch.load("/storage/data_4T/alessiarondinella_data/Brain-Change-Estimation/results_2/Unet-84.pth"))
+    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/lemuel_MSE_max/Unet-96.pth"))
+
+    # Training immages    
+    # test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/A_halfwayto_B_brain.nii.gz", 
+    #                            "immB" : "/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/B_halfwayto_A_brain.nii.gz", 
+    #                            "immGT":"/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/A_to_B_flow.nii.gz"})
+
 
     test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/A_halfwayto_B_brain.nii.gz", 
                                "immB" : "/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/B_halfwayto_A_brain.nii.gz", 
                                "immGT":"/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/A_to_B_flow.nii.gz"})
     
-    print(test_dataset)
+    #print(test_dataset)
 
     print(test_dataset.keys())
 
-    print(test_dataset["images"].size())
+    print(test_dataset["images"].size(), test_dataset["immGT"].size())
+
 
     out=UNet(test_dataset["images"].unsqueeze(0).to(device))
     out= out.squeeze(0)
 
     import nibabel as nib
-    mri = nib.nifti1.Nifti1Image(out.squeeze(0).cpu().detach().numpy(), test_dataset['immGT_meta_dict']['original_affine']) #np.eye(4)
-    mri.to_filename('/storage/data_4T/alessiarondinella_data/Brain-Change-Estimation/results_2/result.nii.gz')
+    #Save output
+    mri = nib.nifti1.Nifti1Image(out.squeeze(0).cpu().detach().numpy(), None)# test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/result.nii.gz')
 
-    mri = nib.nifti1.Nifti1Image(test_dataset["images"][0].squeeze(0).cpu().detach().numpy(), test_dataset['immGT_meta_dict']['original_affine']) #np.eye(4)
-    mri.to_filename('/storage/data_4T/alessiarondinella_data/Brain-Change-Estimation/results_2/input1.nii.gz')
+    #Save input 0
+    mri = nib.nifti1.Nifti1Image(test_dataset["images"][0].squeeze(0).cpu().detach().numpy(),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/input0.nii.gz')
+    #Save input 1 
+    mri = nib.nifti1.Nifti1Image(test_dataset["images"][1].squeeze(0).cpu().detach().numpy(),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/input1.nii.gz')
 
+    #Save GT
+    mri = nib.nifti1.Nifti1Image(test_dataset["immGT"].squeeze(0).cpu().detach().numpy(),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/GT.nii.gz')
