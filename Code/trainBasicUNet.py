@@ -88,8 +88,8 @@ if __name__ == '__main__':
 
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-
     optimizer = AdamW(UNet.parameters())
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,len(train_loader))
     #loss_function = nn.MSELoss(reduction='mean')
 
     if args.loss == "mse" and args.reduction == "max":
@@ -138,7 +138,10 @@ if __name__ == '__main__':
 
                         output = UNet(data)
 
-                        loss = loss_function(output, GT)
+                        # normalized_GT = ((GT + 1) / 2.0) * 255
+                        # normalized_outuput = ((output + 1) / 2.0) * 255
+
+                        loss = loss_function(output, GT) #normalized_outuput, normalized_GT
                         # print(loss.item())
                         # Update loss
                         sum_loss[mode] += loss.item()
@@ -146,9 +149,13 @@ if __name__ == '__main__':
                         if mode == 'train':
                             loss.backward()  
                             optimizer.step()
+                            print(f"Current learning rate: {scheduler.get_last_lr()}")
                         #compute accuracy
                         batch_accuracy = ssim(output, GT).sum().item()/ data.size(0)
                         sum_accuracy[mode] += batch_accuracy
+
+        if mode == 'train':
+            scheduler.step()
 
         #avg_epoch_loss = sum(epoch_losses) / len(epoch_losses)
         epoch_loss = {split: sum_loss[split]/len(loaders[split]) for split in ["train", "valid"]}
