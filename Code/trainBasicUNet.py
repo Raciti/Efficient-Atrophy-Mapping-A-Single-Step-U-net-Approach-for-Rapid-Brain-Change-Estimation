@@ -59,6 +59,8 @@ if __name__ == '__main__':
                         help='Reduction loss - can be sum, max or mean. max can only be used in mse loss. (default: mean).')
     parser.add_argument('--exp', type=int, default=2, 
                         help='Exponent for the calculation of mse (default: mean).')
+    parser.add_argument('--scheduler', type = bool, default= False,
+                        help='Enable scheduler usage')
     parser.add_argument('--epochs', type=int, default=100,
                         help='Number of training epochs (default: 100)' )
     parser.add_argument('--train_batch_size', type=int, default=4,
@@ -89,9 +91,11 @@ if __name__ == '__main__':
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
     optimizer = AdamW(UNet.parameters())
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer = optimizer,
-                                                           T_max = len(train_loader) * args.epochs, 
-                                                           eta_min = 1e-5)
+
+    if args.scheduler == True:    
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer = optimizer,
+                                                                T_max = len(train_loader) * args.epochs, 
+                                                                eta_min = 1e-5)
     #loss_function = nn.MSELoss(reduction='mean')
 
     if args.loss == "mse" and args.reduction == "max":
@@ -148,12 +152,14 @@ if __name__ == '__main__':
                         # Update loss
                         sum_loss[mode] += loss.item()
 
-                        if mode == 'train':
+                        if mode == 'train' and args.scheduler == True:
                             loss.backward()  
                             optimizer.step()
                             scheduler.step()
                             print(f"Current learning rate: {scheduler.get_last_lr()}")
-                            print(optimizer.state_dict()['param_groups'][0]['lr'])
+                        elif mode == 'train':
+                            loss.backward()  
+                            optimizer.step()
                         #compute accuracy
                         batch_accuracy = ssim(output, GT).sum().item()/ data.size(0)
                         sum_accuracy[mode] += batch_accuracy
