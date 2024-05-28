@@ -17,6 +17,12 @@ atrophy mapping. We believe that this pipeline could significantly
 benefit clinical applications regarding the measurement of brain
 atrophy. <br>
 Our model manages to achieve, with our GPU and CPU, a flow given two magnetic resonances in **0.02s** using the *GPU* and in **2.67s** using the *CPU*, the first iterations suffer from a latency time due to loading the model into the cache.
+<div style="display: flex; justify-content: space-between;">
+    <img src="https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/img/tg_A.png" alt="example input" width="200" height="250" />
+    <img src="https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/img/tg_c.png" alt="example input" height="250"/>
+    <img src="https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/img/tg_s.png" alt="example input" height="250"/>
+</div>
+
 # Getting Started
 To begin with, in the Environment folder there is a file named [environment.yaml](https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/Environment/environment.yml), it contains all the necessary libraries to be able to use our model. <br>
 To create an environment with the following .yaml file using conda run the following code:
