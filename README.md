@@ -1,4 +1,4 @@
-# A faster algorithm for brain change estimation
+# Efficient Atrophy Mapping: A Single-Step U-net Approach for Rapid Brain Change Estimation
 
 The estimation brain atrophy can be crucial in the
 evaluation of brain diseases and can help to analyze their progression. Existing methods compute the atrophy map from two
