@@ -3,7 +3,7 @@ from monai.transforms import MapTransform
 import copy
 import torch
 
-# Trasformazione personalizzata
+
 class preprocessing(MapTransform):
     def __init__(self, keys: KeysCollection):
         super().__init__(keys)
