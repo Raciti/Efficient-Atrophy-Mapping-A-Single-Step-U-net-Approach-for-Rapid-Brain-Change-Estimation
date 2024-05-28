@@ -19,6 +19,12 @@ Dove i parametri rappresentano:
 
 **Solo i primi tre argomenti sono obbligatori**.
 
+Il codice `results.py` viene eseguito tramite bash. 
+
+    python results.py --calculate 
+
+Dove
+ 1. calculate rappresenta un valore bollenano per rigenerare i dizionari, se posto a False genereà solo i plot
 ## Formato CSV
 
 | ImmA | ImmB  | GT                     | 

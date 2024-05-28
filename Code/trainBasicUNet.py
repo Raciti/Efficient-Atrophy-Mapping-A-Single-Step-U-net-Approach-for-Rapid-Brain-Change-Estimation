@@ -10,10 +10,7 @@ import monai
 from monai.data import CSVDataset
 from monai.networks.nets import BasicUNet
 from torch.optim import AdamW
-from monai.transforms import LoadImage, Compose, MapTransform, LoadImageD, ToTensord, EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD #AddChannelD,
-from monai.config import KeysCollection
-#from monai.losses.ssim_loss import SSIMLoss
-#from monai.metrics.regression import SSIMetric
+from monai.transforms import Compose, LoadImageD, ToTensord, EnsureChannelFirstD, ResizeD  
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from tqdm import tqdm
 import numpy as np
@@ -71,9 +68,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
-    print(device)
-
-    #transform = Compose([preprocessing()])
 
     train_dataset = CSVDataset(src=args.train_csv, transform=transform, skiprows=1) 
     valid_dataset = CSVDataset(src=args.valid_csv, transform=transform, skiprows=1)
@@ -90,13 +84,15 @@ if __name__ == '__main__':
 
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-    optimizer = AdamW(UNet.parameters())
+    optimizer = AdamW(UNet.parameters(), lr=0.001)
+    
+    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/GT_norm_0_2k_b4_lr_scheduler/Unet-91.pth"))
+    optimizer.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/GT_norm_0_2k_b4_lr_scheduler/optim-91.pth"))
 
     if args.scheduler == True:    
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer = optimizer,
                                                                 T_max = len(train_loader) * args.epochs, 
                                                                 eta_min = 1e-5)
-    #loss_function = nn.MSELoss(reduction='mean')
 
     if args.loss == "mse" and args.reduction == "max":
         loss_function = losses.CustomMSELoss(args.exp, "max")
@@ -123,7 +119,6 @@ if __name__ == '__main__':
     best_val_accuracy=0
     
     for epoch in range(args.epochs):
-        #print("Learning Rate:", optimizer.param_groups[-1]['lr'])
         sum_loss = {"train": 0, "valid": 0}
         sum_accuracy = {"train": 0, "valid": 0}
         
@@ -144,11 +139,8 @@ if __name__ == '__main__':
 
                         output = UNet(data)
 
-                        # normalized_GT = ((GT + 1) / 2.0) * 255
-                        # normalized_outuput = ((output + 1) / 2.0) * 255
-
-                        loss = loss_function(output, GT) #normalized_outuput, normalized_GT
-                        # print(loss.item())
+                        loss = loss_function(output, GT)  
+                        
                         # Update loss
                         sum_loss[mode] += loss.item()
 
@@ -160,6 +152,7 @@ if __name__ == '__main__':
                         elif mode == 'train':
                             loss.backward()  
                             optimizer.step()
+                        
                         #compute accuracy
                         batch_accuracy = ssim(output, GT).sum().item()/ data.size(0)
                         sum_accuracy[mode] += batch_accuracy
@@ -188,16 +181,6 @@ if __name__ == '__main__':
             print(f"Best val loss: {best_val_loss:.4f}\n")
             torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
             torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
-        
-        """# Check if we obtained the best acc
-        if epoch_acc["valid"]>best_val_accuracy:
-            # aggiorno e salvo il modello se è migliore
-            best_val_accuracy=epoch_acc["valid"]
-            print(f"Best val acc: {best_val_accuracy:.4f}\n")
-            torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
-            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))"""
-        
-
         
     # Plot loss history
     plt.title("MSE")

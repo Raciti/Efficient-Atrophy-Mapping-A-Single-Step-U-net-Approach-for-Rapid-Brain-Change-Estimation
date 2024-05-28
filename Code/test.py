@@ -1,26 +1,20 @@
-import os
 import argparse
 
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from torch.cuda.amp import autocast
 
-import monai
-from monai.data import CSVDataset
 from monai.networks.nets import BasicUNet
-from torch.optim import AdamW
-from monai.transforms import SpacingD, LoadImage, Compose, MapTransform, LoadImageD, ToTensord,  EnsureChannelFirstD, CropForegroundd, ResizeWithPadOrCropD, ResizeD #AddChannelD,
-from monai.config import KeysCollection
+from monai.transforms import Compose, LoadImageD, ToTensord,  EnsureChannelFirstD, ResizeD 
 
-from tqdm import tqdm
-import numpy as np
+from utils import losses
 
 from utils import transform
 
-import matplotlib.pyplot as plt
+
+import time
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = "cpu"
+print(device)
 
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
@@ -50,32 +44,30 @@ if __name__ == '__main__':
 
 
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/train_mse_max/Unet-14.pth"))
+    UNet.load_state_dict(torch.load("Model/Unet.pth"))
 
-    # Training immages    
-    # test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/A_halfwayto_B_brain.nii.gz", 
-    #                            "immB" : "/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/B_halfwayto_A_brain.nii.gz", 
-    #                            "immGT":"/storage/data_4T/lpuglisi-siena/SIENA/I969035_to_I1564138/A_to_B_flow.nii.gz"})
+    test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I59690_to_I109886/A_halfwayto_B_brain.nii.gz", 
+                               "immB" : "/storage/data_4T/lpuglisi-siena/SIENA/I59690_to_I109886/B_halfwayto_A_brain.nii.gz", 
+                               "immGT":"/storage/data_4T/lpuglisi-siena/SIENA/I59690_to_I109886/A_to_B_flow.nii.gz"})
 
+    loss_function = losses.CustomMSELoss(2, "max")
 
-    test_dataset = transform({"immA": "/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/A_halfwayto_B_brain.nii.gz", 
-                               "immB" : "/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/B_halfwayto_A_brain.nii.gz", 
-                               "immGT":"/storage/data_4T/lpuglisi-siena/SIENA/I96321_to_I727661/A_to_B_flow.nii.gz"})
-    
-    #print(test_dataset)
-
-    print(test_dataset.keys())
-
-    print(test_dataset["images"].size(), test_dataset["immGT"].size())
-
+    start_time = time.time()
 
     out=UNet(test_dataset["images"].unsqueeze(0).to(device))
-    out= out.squeeze(0)
+
+    end_time = time.time()
+
+    print(f"\nEsecution time: {round(end_time-start_time,2)}s.\n")
+
+    loss = loss_function((out - 2000) / 1000, (test_dataset["immGT"].squeeze(0).to(device) - 2000) / 1000)
+    print(f"Loss MSE: {loss.item()}.\n")
 
     import nibabel as nib
     #Save output
-    mri = nib.nifti1.Nifti1Image(out.squeeze(0).cpu().detach().numpy(), None)# test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
-    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/result.nii.gz')
+    mri = nib.nifti1.Nifti1Image(((out.cpu().detach().numpy() - 2000) / 1000), None)# test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/target.nii.gz')
+    print(f"Target max: {mri.get_fdata().max()} \nTarget min: {mri.get_fdata().min()}\n")
 
     #Save input 0
     mri = nib.nifti1.Nifti1Image(test_dataset["images"][0].squeeze(0).cpu().detach().numpy(),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
@@ -85,5 +77,6 @@ if __name__ == '__main__':
     mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/input1.nii.gz')
 
     #Save GT
-    mri = nib.nifti1.Nifti1Image(test_dataset["immGT"].squeeze(0).cpu().detach().numpy(),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
+    mri = nib.nifti1.Nifti1Image(((test_dataset["immGT"].squeeze(0).cpu().detach().numpy() - 2000) / 1000),None) # test_dataset['immGT_meta_dict']['original_affine'] #np.eye(4)
     mri.to_filename('/storage/data_4T/riccardoraciti/unet/prove/results/GT.nii.gz')
+    print(f"GT max: {mri.get_fdata().max()} \nGT min: {mri.get_fdata().min()}\n")

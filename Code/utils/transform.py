@@ -11,9 +11,8 @@ class preprocessing(MapTransform):
     def __call__(self, data):
         
         d = copy.deepcopy(data)
-        d['images'] = torch.cat([data["immA"], data["immB"]], dim=0) # Ritorna immagine concatenata e GT
-        #d['immGT'] = ((data['immGT'] + 1) / 2.0) * 255 # Ritorna immagine concatenata e GT
+        d['images'] = torch.cat([data["immA"], data["immB"]], dim=0)  
+        d['immGT'] = ((data['immGT'] * 1000) + 2000)
         del d['immA']
         del d['immB']
-        #print("KEYS:", d.keys())
         return d 
