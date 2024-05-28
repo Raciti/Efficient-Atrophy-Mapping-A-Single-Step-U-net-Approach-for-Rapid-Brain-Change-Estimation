@@ -33,4 +33,4 @@ Where
 | ----------- | --- | ------------------------------- |
 | path_immA | path_immB | path_GT| 
 
-[Esempio CSV](https://github.com/Raciti/Brain-Change-Estimation/blob/main/Data/train.csv) 
+[CSV Example](https://github.com/Raciti/Brain-Change-Estimation/blob/main/Data/train.csv) 
