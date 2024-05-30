@@ -36,11 +36,10 @@ transform = Compose([
 ])
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test_csv', type=str, default = "/home/alessiarondinella/rraciti/Brain-Change-Estimation/Data/test.csv", help='Path csv of test dataset.')
-    parser.add_argument('--dir_load_model', type=str, default="/storage/data_4T/alessiarondinella_data/Brain-Change-Estimation/result", help='Path directory where to load checkpoint.')
-    parser.add_argument('--dir_save_results', type=str, default="/storage/data_4T/alessiarondinella_data/Brain-Change-Estimation/result/test", help='Path directory where to save results.')
+    parser.add_argument('--test_csv', type=str, default = "Data/test.csv", help='Path csv of test dataset.')
+    parser.add_argument('--dir_load_model', type=str, default="Result", help='Path directory where to load checkpoint.')
+    parser.add_argument('--dir_save_results', type=str, default="Result/test", help='Path directory where to save results.')
 
     args = parser.parse_args()
 

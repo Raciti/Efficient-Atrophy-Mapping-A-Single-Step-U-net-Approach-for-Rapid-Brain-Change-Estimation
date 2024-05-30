@@ -25,11 +25,7 @@ import matplotlib.pyplot as plt
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
     EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
-    #AddChannelD(keys=["immA", "immB", "immGT"]),
     ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
-    #CropForegroundd(keys=["immA", "immB", "immGT"], source_key="immA"),
-    #SpacingD(keys=["immA", "immB", "immGT"], pixdim=1.5),
-    #ResizeWithPadOrCropD(keys=["immA", "immB", "immGT"], spatial_size=(130, 130, 130), mode='minimum'),
     ToTensord(keys=["immA", "immB", "immGT"]),
 
 ])
