@@ -44,7 +44,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.calculate == True:
-        test_dataset = CSVDataset(src="Data/test.csv", transform=transform, skiprows=1) 
+        test_dataset = CSVDataset(src="..Data/test.csv", transform=transform, skiprows=1) 
         
         train_loader = DataLoader(dataset=test_dataset,
                                 batch_size=1,
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         for device in ['cuda', 'cpu']:
             print(device)
             UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-            UNet.load_state_dict(torch.load("Model/Unet.pth"))
+            UNet.load_state_dict(torch.load("..Model/Unet.pth"))
             ssim = StructuralSimilarityIndexMeasure(data_range=1.0).to(device)
 
             for batch in tqdm(train_loader):
@@ -86,23 +86,23 @@ if __name__ == '__main__':
                 NCC[device].append(ncc(target,gt).item())
             
 
-        with open('Results/Time.pkl', 'wb') as file:
+        with open('..Results/Time.pkl', 'wb') as file:
             pickle.dump(Time, file)
-        with open('Results/MSE.pkl', 'wb') as file:
+        with open('..Results/MSE.pkl', 'wb') as file:
             pickle.dump(MSE, file)
-        with open('Results/SSIM.pkl', 'wb') as file:
+        with open('..Results/SSIM.pkl', 'wb') as file:
             pickle.dump(SSIM, file)
-        with open('Results/NCC.pkl', 'wb') as file:
+        with open('..Results/NCC.pkl', 'wb') as file:
             pickle.dump(NCC, file)
 
     else:
-        with open("Results/Time.pkl", 'rb') as file:
+        with open("..Results/Time.pkl", 'rb') as file:
             Time = pickle.load(file)
-        with open("Results/MSE.pkl", 'rb') as file:
+        with open("..Results/MSE.pkl", 'rb') as file:
             MSE = pickle.load(file)
-        with open("Results/SSIM.pkl", 'rb') as file:
+        with open("..Results/SSIM.pkl", 'rb') as file:
             SSIM = pickle.load(file)
-        with open("Results/NCC.pkl", 'rb') as file:
+        with open("..Results/NCC.pkl", 'rb') as file:
             NCC = pickle.load(file)
 
     
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     plt.plot(Time["cuda"], label='gpu')
     plt.plot(Time["cpu"], label='cpu')
     plt.legend()
-    plt.savefig("Results/Time.png")
+    plt.savefig("..Results/Time.png")
     plt.close()
     
     plt.title("Esecution Time GPU")
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     plt.ylabel('Time')
     plt.plot(Time["cuda"][1:], label='gpu')
     plt.legend()
-    plt.savefig("Results/Time_gpu.png")
+    plt.savefig("..Results/Time_gpu.png")
     plt.close()
     
     max_time_gpu = max(Time["cuda"])
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     plt.ylabel('Time')
     plt.plot(Time["cpu"], label='cpu')
     plt.legend()
-    plt.savefig("Results/Time_cpu.png")
+    plt.savefig("..Results/Time_cpu.png")
     plt.close()
 
     max_time_cpu = max(Time["cpu"])
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     plt.plot(MSE["cpu"], label='cpu')
     plt.plot(MSE["cuda"], label='gpu')
     plt.legend()
-    plt.savefig("Results/MSE.png")
+    plt.savefig("..Results/MSE.png")
     plt.close()
 
     max_mse_cpu = max(MSE["cpu"])
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     plt.plot(SSIM["cpu"], label='cpu')
     plt.plot(SSIM["cuda"], label='gpu')
     plt.legend()
-    plt.savefig("Results/SSIM.png")
+    plt.savefig("..Results/SSIM.png")
     plt.close()
 
     max_ssim_cpu = max(SSIM["cpu"])
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     plt.plot(NCC["cpu"], label='cpu')
     plt.plot(NCC["cuda"], label='gpu')
     plt.legend()
-    plt.savefig("Results/NCC.png")
+    plt.savefig("..Results/NCC.png")
     plt.close()
 
     max_ncc_cpu = max(NCC["cpu"])
