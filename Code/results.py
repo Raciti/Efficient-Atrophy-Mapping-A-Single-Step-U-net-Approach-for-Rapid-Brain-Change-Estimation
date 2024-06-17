@@ -44,7 +44,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.calculate == True:
-        test_dataset = CSVDataset(src="..Data/test.csv", transform=transform, skiprows=1) 
+        test_dataset = CSVDataset(src="../Data/test.csv", transform=transform, skiprows=1) 
         
         train_loader = DataLoader(dataset=test_dataset,
                                 batch_size=1,
