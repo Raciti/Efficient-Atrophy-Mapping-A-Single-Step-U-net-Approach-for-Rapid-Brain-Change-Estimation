@@ -41,7 +41,6 @@ if __name__ == '__main__':
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
     UNet.load_state_dict(torch.load("../Model/Unet.pth")) 
 
-
     test_dataset = transform({"immA": "../Data/A_halfwayto_B_brain.nii.gz", 
                                "immB" : "../Data/B_halfwayto_A_brain.nii.gz", 
                                "immGT":"../Data/A_to_B_flow.nii.gz"})

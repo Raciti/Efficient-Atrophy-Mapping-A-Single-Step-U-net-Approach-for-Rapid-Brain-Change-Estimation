@@ -202,15 +202,3 @@ if __name__ == '__main__':
 
     print(f"NCC CPU -> max:{max_ncc_cpu}; min:{min_ncc_cpu}; mean:{mean_ncc_cpu}.")
     print(f"NCC GPU -> max:{max_ncc_gpu}; min:{min_ncc_gpu}; mean:{mean_ncc_gpu}.")
-
-# Time GPU -> max:2.94; min:0.02; mean:0.04949494949494931.
-# Time CPU -> max:3.19; min:2.67; mean:2.9836363636363634.
-
-# MSE CPU -> max:0.0115367341786623; min:9.864193998510018e-05; mean:0.0008173479576303501.
-# MSE GPU -> max:0.011536423116922379; min:9.863869490800425e-05; mean:0.0008173438736132929.
-
-# SSIM CPU -> max:0.9432607889175415; min:0.7165855169296265; mean:0.884942119771784.
-# SSIM GPU -> max:0.943253755569458; min:0.7165293097496033; mean:0.8849537438816495.
-
-# NCC CPU -> max:-0.10716778039932251; min:-0.17413167655467987; mean:-0.1486158450745573.
-# NCC GPU -> max:-0.10717373341321945; min:-0.17412962019443512; mean:-0.14861157137637188.
