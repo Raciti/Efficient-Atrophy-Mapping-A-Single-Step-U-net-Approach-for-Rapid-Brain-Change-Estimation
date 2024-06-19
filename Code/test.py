@@ -75,3 +75,4 @@ if __name__ == '__main__':
     #Save GT
     mri = nib.nifti1.Nifti1Image(((test_dataset["immGT"].squeeze(0).cpu().detach().numpy() - 2000) / 1000),None)  
     mri.to_filename('../Results/GT.nii.gz')
+

@@ -43,3 +43,6 @@ The output of the model will have to be **normalized** to return it to the origi
 
 # Example of Usage
 In the Code folder is prsetne a file called *results.py*, in this file the model is used to test its operation and draw conclusions, it is very simple to understand its operation just exclude the comparison with the GT.
+
+# Readyto use model
+There is the file [use.py](https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/Code/use.py) which allows by specifying **path datset csv** and **path directory to save flow** to use the model, with everything already implemented and ready.
