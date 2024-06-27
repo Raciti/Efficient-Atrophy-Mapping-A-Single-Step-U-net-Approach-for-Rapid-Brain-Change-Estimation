@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
     EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
-    ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
+    ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(182, 218, 170)),
     ToTensord(keys=["immA", "immB", "immGT"]),
 
 ])
@@ -52,6 +52,10 @@ if __name__ == '__main__':
                         help='Reduction loss - can be sum, max or mean. max can only be used in mse loss. (default: mean).')
     parser.add_argument('--exp', type=int, default=2, 
                         help='Exponent for the calculation of mse (default: mean).')
+    parser.add_argument('--load_model', type = str, default= "",
+                        help='Load a version of the previous model to continue training it. (need unet.pth and optim.pth)')
+    parser.add_argument('--load_optim', type = str, default= "",
+                        help='Load a version of the previous optim to continue training it. (need unet.pth and optim.pth)')
     parser.add_argument('--scheduler', type = bool, default= False,
                         help='Enable scheduler usage')
     parser.add_argument('--epochs', type=int, default=100,
@@ -82,8 +86,12 @@ if __name__ == '__main__':
     UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
     optimizer = AdamW(UNet.parameters(), lr=0.001)
     
-    UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/GT_norm_0_2k_b4_lr_scheduler/Unet-91.pth"))
-    optimizer.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training/GT_norm_0_2k_b4_lr_scheduler/optim-91.pth"))
+    if args.load_model != '' and args.load_optim != '':
+        UNet.load_state_dict(torch.load(args.load_model))
+        optimizer.load_state_dict(torch.load(args.load_optim))
+    
+    if (args.load_model != '') != (args.load_optim != ''):
+        raise RuntimeError("Both the path of the model to be trained and the path of the relative Optim must be provided.")
 
     if args.scheduler == True:    
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer = optimizer,
