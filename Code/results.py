@@ -24,7 +24,8 @@ import pickle
 basic_1 = Compose([
     LoadImageD(keys=["immA", "immB", "immGT"]),
     EnsureChannelFirstD(keys=["immA", "immB", "immGT"], channel_dim = 'no_channel'),
-    ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
+    # ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(121, 145, 113)),
+    ResizeD(keys=["immA", "immB", "immGT"], spatial_size=(182, 218, 170)),
     ToTensord(keys=["immA", "immB", "immGT"]),
 
 ])
@@ -60,7 +61,8 @@ if __name__ == '__main__':
         for device in ['cuda', 'cpu']:
             print(device)
             UNet = BasicUNet(spatial_dims=3, in_channels= 2, out_channels = 1, features=(32, 32, 64, 128, 256, 32)).to(device)
-            UNet.load_state_dict(torch.load("../Model/Unet.pth"))
+            # UNet.load_state_dict(torch.load("../Model/Unet.pth"))
+            UNet.load_state_dict(torch.load("/storage/data_4T/riccardoraciti/unet/training_senza_resize/b4_0_4k_max/Unet-388.pth"))
             ssim = StructuralSimilarityIndexMeasure(data_range=1.0).to(device)
 
             for batch in tqdm(train_loader):

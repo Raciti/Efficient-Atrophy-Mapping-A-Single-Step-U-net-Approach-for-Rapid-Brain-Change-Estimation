@@ -158,7 +158,7 @@ if __name__ == '__main__':
                             optimizer.step()
                         
                         #compute accuracy
-                        batch_accuracy = ssim(output, GT).sum().item()/ data.size(0)
+                        batch_accuracy = ssim(output, GT).sum().item()
                         sum_accuracy[mode] += batch_accuracy
 
 
