@@ -64,6 +64,8 @@ if __name__ == '__main__':
                         help='Batch size training (default: 4)')
     parser.add_argument('--valid_batch_size', type=int, default=4,
                         help='Batch size validation (default: 4)')
+    parser.add_argument('--start_epoch', type=int, default= 0,
+                        help='Start of the new epoch issue')
     
     args = parser.parse_args()
 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
                             optimizer.step()
                         
                         #compute accuracy
-                        batch_accuracy = ssim(output, GT).sum().item()
+                        batch_accuracy = ssim(output, GT).sum().item()/ data.size(0)
                         sum_accuracy[mode] += batch_accuracy
 
 
@@ -167,7 +169,7 @@ if __name__ == '__main__':
         epoch_loss = {split: sum_loss[split]/len(loaders[split]) for split in ["train", "valid"]}
         epoch_acc = {split: sum_accuracy[split]/len(loaders[split]) for split in ["train", "valid"]}
         print("-" * 100)
-        print("Epoch {}/{}".format(epoch, args.epochs))
+        print("Epoch {}/{}".format(epoch + args.start_epoch, args.epochs + args.start_epoch))
         print(f"TRAIN LOSS MSE: {epoch_loss['train']:.4f}")
         print(f"VAL LOSS MSE: {epoch_loss['valid']:.4f}")
         print(f"TRAIN SSIM: {epoch_acc['train']:.4f}")
@@ -183,8 +185,8 @@ if __name__ == '__main__':
         #if min(losses) == avg_epoch_loss:
             best_val_loss=epoch_loss["valid"]
             print(f"Best val loss: {best_val_loss:.4f}\n")
-            torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch}.pth'))
-            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch}.pth'))
+            torch.save(UNet.state_dict(), os.path.join(args.dict_save_model, f'Unet-{epoch + args.start_epoch}.pth'))
+            torch.save(optimizer.state_dict(), os.path.join(args.dict_save_model, f'optim-{epoch + args.start_epoch}.pth'))
         
     # Plot loss history
     plt.title("MSE")
@@ -193,7 +195,7 @@ if __name__ == '__main__':
     plt.plot(history_loss["train"], label='train')
     plt.plot(history_loss["valid"], label='val')
     plt.legend()
-    plt.savefig(os.path.join(args.dict_save_model, 'MSELoss_numepoche_{}.png'.format(args.epochs)))
+    plt.savefig(os.path.join(args.dict_save_model, 'MSELoss_numepoche_{}.png'.format(args.epochs + args.start_epoch)))
     plt.close()
 
     # Plot acc history
@@ -203,5 +205,5 @@ if __name__ == '__main__':
     plt.plot(history_acc["train"], label='train')
     plt.plot(history_acc["valid"], label='val')
     plt.legend()
-    plt.savefig(os.path.join(args.dict_save_model, 'SSIM_numepoche_{}.png'.format(args.epochs)))
+    plt.savefig(os.path.join(args.dict_save_model, 'SSIM_numepoche_{}.png'.format(args.epochs + args.start_epoch)))
     plt.close()

@@ -2,7 +2,7 @@
 
 The `trainBasicUNet.py` code is executed via bash. 
 
-    python trainBasicUNet.py --train.csv --valid.csv --dict_save_model --gpu --loss --reduction --exp --load_model --load_optim --scheduler --epochs --train_batch_size --valid_batch_size
+    python trainBasicUNet.py --train.csv --valid.csv --dict_save_model --gpu --loss --reduction --exp --load_model --load_optim --scheduler --epochs --train_batch_size --valid_batch_size --start_epoch
 
 Where the parameters represent:
   1. Path `train.csv`
@@ -18,6 +18,7 @@ Where the parameters represent:
   11. Number of epochs
   12. Batch value of the train
   13. Batch value of the validation
+  14. For the final grhap
 
 
 **Only the first three topics are mandatory**.
