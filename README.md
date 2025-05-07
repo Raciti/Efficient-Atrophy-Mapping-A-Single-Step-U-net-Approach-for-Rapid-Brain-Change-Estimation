@@ -46,3 +46,6 @@ In the Code folder is prsetne a file called *results.py*, in this file the model
 
 # Readyto use model
 There is the file [use.py](https://github.com/Raciti/A-faster-algorithm-for-brain-change-estimation/blob/main/Code/use.py) which allows by specifying **path datset csv** and **path directory to save flow** to use the model, with everything already implemented and ready.
+
+# Reference
+At the following link is the ([paper](https://ieeexplore.ieee.org/document/10796213)).
